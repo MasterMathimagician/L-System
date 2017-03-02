@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
+//using Microsoft.CSharp;
 
 public class LSystemController : MonoBehaviour {
 
@@ -20,34 +21,40 @@ public class LSystemController : MonoBehaviour {
 	private string[] rules_in = {"a", "b"};
 	private string[] rules_out = {"b", "aa"};
 
+	string String_Replace(string input){
+		string output = "";
+		Debug.Log (input.Length);
 
-
-	// Use this for initialization
-	void Start () {
-		starter.text = "a";
-		LSystemGo (iterations);
-	}
-
-	void String_Replace(string input, string output){
-		output = "";
 		for (int i = 0; i < input.Length; ++i) {
 			for (int j = 0; j < rules_in.Length; ++j) {
-				//if (input [i] == rules_in [j]) {
+				string temp = input[i].ToString();
+				if (string.Equals(temp, rules_in [j])) {
 					output += rules_out [j];
-				//}
+				} else if (j == rules_in.Length -1 ) {
+					output+= input[i];
+				}
+				//Debug.Log (output);
 			}
 		}
-		return;
+		return output;
 	}
 
-	void LSystemGo(int iterations) {
-		string produced = "";
+	string LSystemGo() {
 		string midstep = starter.text;
 		for (int i = 0; i < iterations; ++i) {
-			String_Replace (midstep, produced);
-			midstep = produced;
+			midstep = String_Replace (midstep);
 		}
-		display.text = produced;
+		display.text = midstep;
+		return midstep;
+	}
+
+	public void MakeString(){
+		LSystemGo ();
+	}
+
+	public void MakeImage(){
+	
+	
 	}
 
 }

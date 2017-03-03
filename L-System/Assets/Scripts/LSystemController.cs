@@ -6,9 +6,14 @@ using UnityEngine.UI;
 
 public class LSystemController : MonoBehaviour {
 
-	/* Character definitions: 	[] - branch
-	 * 							letters - lines with colour c
-	 * 							symbols - angles
+	/* This Program allows the user to define a set of rules and produce a basic L-System from those rules
+	 * 
+	 * 
+	 * 
+	 * Character definitions: 	[] - branch
+	 * 							letters - lines with colour c and length l, if l = 0 the line is not drawn
+	 * 							symbols - angles/turn
+	 * 							
 	*/
 
 

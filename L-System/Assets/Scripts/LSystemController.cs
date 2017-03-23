@@ -21,6 +21,17 @@ constants: [, ]
 axiom  : a
 rules  : (b → bb), (a → b[a]a)
 
+45 = 0.7854
+90 = 1.571
+{
+use b = bb
+	a = b[+a]-a
+	! = 1.571
++ = 0.7854
+- = -0.7854
+! = 1.571
+axiom = !a
+}
 0: draw a line segment ending in a leaf
 1: draw a line segment
 [: push position and angle, turn left 45 degrees
@@ -52,10 +63,8 @@ public class LSystemController : MonoBehaviour {
 	*/
 	/*
 	To do: 
-		create the line drawer 
 		add stochasticity
 		adjust lengths a -> aa has equal lengths
-		Fix problems with colours
 	*/
 		struct stoch_rules {
 		public float probability;
@@ -92,11 +101,13 @@ public class LSystemController : MonoBehaviour {
 	private string[] rules_default = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
 		"q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", 
 		"L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
+
 	private string[] symbols_default = { "+", "-","!", "@", "#", "$", "%", "^", "&", "*", "(", ")"};
 	private string[] rules_in = {"a", "b", "c", "d", "e", "f", "g", "h", "i", "j", "k", "l", "m", "n", "o", "p",
 		"q", "r", "s", "t", "u", "v", "w", "x", "y", "z", "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", 
 		"L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z"};
 	private float[] rules_ratios;
+	private float[] final_ratios;
 	private string[] rules_out;
 	private Color[] colours;
 	private float[] width;
@@ -140,14 +151,15 @@ public class LSystemController : MonoBehaviour {
 		for (int i=0; i<11;++i) {
 			dropdown_recursions.options.Add (new Dropdown.OptionData(){text=i.ToString()});
 		}
-			
+		final_ratios = new float[1];
+		final_ratios [0] = 1.0f;
 		rules_out = new string[rules_default.Length];
 		colours = new Color[rules_default.Length];
 		length = new float[rules_default.Length];
 		width = new float[rules_default.Length];
 		for (int i=0; i<rules_default.Length;++i) {
 			rules_out [i] = rules_default [i];
-			colours[i] = new Color(0.0f,0.0f,0.0f,1.0f);
+			colours[i] = new Color(1.0f,1.0f,1.0f,1.0f);
 			length [i] = 3.0f;
 			width [i] = 0.1f;
 		}
@@ -157,59 +169,27 @@ public class LSystemController : MonoBehaviour {
 		}
 	}
 
-	public void MakeRatios(int position) {
-		Vector3 finish = new Vector3(0,0,0);
-		float angle = 0;
-		int branch = 0;
-
-
-		for (int i=0;i< rules_out[position].Length; ++i) {
-			if (string.Equals(rules_out[position][i], "[")) {
-				branch++;
-			}
-			if (string.Equals(rules_out[position][i], "]")) {
-				branch--;
-			}
-
-			if (branch < 1) {
-				for (int j = 0; j < rules_in.Length; ++j) {
-					//string temp = input[i].ToString();
-					//if (string.Equals(temp, rules_in [j])) {
-					//	output += rules_out [j];
-					//} else if (j == rules_in.Length -1 ) {
-					//	output+= input[i];
-					//}
-
-
-					//if (true/*line*/) {
-
-					//} else if (false/*angle*/) {
-
-					//} else if (false/*push to pop*/) {
-
-
-					//}
-				}
-
-				for (int j = 0; j < symbols_default.Length; ++j) {
-					//string temp = input[i].ToString();
-					//if (string.Equals(temp, rules_in [j])) {
-					//	output += rules_out [j];
-					//} else if (j == rules_in.Length -1 ) {
-					//	output+= input[i];
-					//}
-
-
-					//if (true/*line*/) {
-
-					//} else if (false/*angle*/) {
-
-					//} else if (false/*push to pop*/) {
-
-
-					//}
+	public void MakeRatios (int position)
+	{
+		float finish = 0.0f;
+		float ang = 0.0f;
+		string rule = rules_out [position];
+		for (int i = 0; i < rule.Length; ++i) {
+			for (int j = 0; j < rules_out.Length; ++j) {
+				if (string.Equals(rules_out[j], rule[i])){
+					finish += (float)Math.Cos(ang)*length[j];
 				}
 			}
+			for (int j = 0; j < symbols_default.Length; ++j) {
+				if (string.Equals(symbols_default[j], rule[i] )) {
+					ang+=angle[j];
+				}
+			}
+		}
+		if (finish > 0) {
+			rules_ratios [position] = length [position] / finish;
+		} else {
+			rules_ratios[position] = 1.0f;
 		}
 	}
 
@@ -220,15 +200,39 @@ public class LSystemController : MonoBehaviour {
 				string temp = input[i].ToString();
 				if (string.Equals(temp, rules_in [j])) {
 					output += rules_out [j];
-				} else if (j == rules_in.Length -1 ) {
-					output+= input[i];
+					break;
+				} else if (j == (rules_in.Length-1)) {
+					output+= temp;
 				}
 			}
+
 		}
+		//float[] temp_array = new float[output.Length]; 
+		//int temp_place = 0;
+
+		//
+		//for (int i = 0; i < input.Length; ++i) {
+		//	string temp = input[i].ToString();
+		//	for (int j = 0; j < rules_in.Length; ++j) {
+		//		if (string.Equals(temp, rules_in [j])) {
+		//			int size = rules_out [j].Length;
+		//			//float temp_ratio = rules_ratios[j] * final_ratios[i];
+		//			float temp_ratio = rules_ratios[j];
+		//			for (int k = 0; k < size; ++k) {
+		//				temp_array[temp_place] = temp_ratio;
+		//				temp_place++;
+		//			}
+		//		} else {
+		//			temp_array[temp_place] = 1.0f;
+		//		}
+		//	}
+		//}
+		//
+		//final_ratios = temp_array;
 		return output;
 	}
 
-	string LSystemGo() {
+	public string LSystemGo() {
 		string midstep = starter.text;
 		for (int i = 0; i < dropdown_recursions.value; ++i) {
 			midstep = String_Replace (midstep);
@@ -239,10 +243,14 @@ public class LSystemController : MonoBehaviour {
 
 	public void BuildTree(string input){
 		for (int i=0;i<rules_in.Length;++i) {
-			MakeRatios (i);
+			//MakeRatios (i);
 		}
-		string tree = LSystemGo ();
+		string tree = LSystemGo (); // add ratios to this method
 		Destroy (mesh);
+		mesh_color.Clear ();
+		mesh_normals.Clear ();
+		mesh_triangles.Clear ();
+		mesh_points.Clear ();
 		mesh = new Mesh ();
 
 		float turtle_direction = 0;
@@ -262,10 +270,14 @@ public class LSystemController : MonoBehaviour {
 				turt_pos temp = turtle_stack.Pop();
 				turtle_direction = temp.ang;
 				turtle_place = temp.vec;
+				Debug.Log ("Popped: " + turtle_place.ToString());
+				Debug.Log (turtle_direction);
 			} else {
 				for (int j=0;j<rules_in.Length;++j) {
 					if (string.Equals(temp_tree, rules_in[j] )) {
-						DrawSquare (turtle_place, turtle_direction, j);
+						DrawSquare (turtle_place, turtle_direction, j, i);
+						turtle_place = new Vector3( turtle_place.x + (length[j]*(float)Math.Cos(turtle_direction)), 
+							turtle_place.y +(length[j]*(float)Math.Sin(turtle_direction)), turtle_place.z);
 						break;
 					}
 				}
@@ -302,27 +314,34 @@ public class LSystemController : MonoBehaviour {
 
 
 
-	public void DrawSquare(Vector3 position, float direction, int variable){
-		Debug.Log ("DrawSquare called");
+	public void DrawSquare(Vector3 position, float direction, int variable, int stringPlace){
 		float w = width[variable]/2;
-		Vector3 P1 = new Vector3( -w, length[variable], 0); //need to adjust once ratios is implemented
-		Vector3 P2 = new Vector3( w, length[variable], 0);
-		Vector3 P3 = new Vector3( -w, 0, 0);
-		Vector3 P4 = new Vector3( w, 0, 0);
+		Vector3 P1 = new Vector3( length[variable], w, 0); //need to adjust once ratios is implemented
+		Vector3 P2 = new Vector3( length[variable], -w, 0);
+		Vector3 P3 = new Vector3( 0, w, 0);
+		Vector3 P4 = new Vector3( 0, -w, 0);
 
 		// use rotation matrix to adjust points
 		// x = px cos a - py sin a + tx
 		// y = px sin a + py cos a + ty
-		float cos_angle = (float)Math.Cos(direction);
+		float cos_angle = (float)Math.Cos(direction) ;
 		float sin_angle = (float)Math.Sin(direction);
-		P1 = new Vector3(P1.x * cos_angle - P1.y * sin_angle + position.x, 
-							P1.x * sin_angle + P1.y * cos_angle + position.y, 0);
-		P2 = new Vector3(P2.x * cos_angle - P2.y * sin_angle + position.x, 
-							P2.x * sin_angle + P2.y * cos_angle + position.y, 0);
-		P3 = new Vector3(P3.x * cos_angle - P3.y * sin_angle + position.x, 
-							P3.x * sin_angle + P3.y * cos_angle + position.y, 0);
-		P4 = new Vector3(P4.x * cos_angle - P4.y * sin_angle + position.x, 
-							P4.x * sin_angle + P4.y * cos_angle + position.y, 0);
+		P1 = new Vector3((P1.x * cos_angle - P1.y * sin_angle + position.x), 
+			(P1.x * sin_angle + P1.y * cos_angle + position.y), 0);
+		P2 = new Vector3((P2.x * cos_angle - P2.y * sin_angle + position.x), 
+			(P2.x * sin_angle + P2.y * cos_angle + position.y), 0);
+		P3 = new Vector3((P3.x * cos_angle - P3.y * sin_angle + position.x), 
+			(P3.x * sin_angle + P3.y * cos_angle + position.y), 0);
+		P4 = new Vector3((P4.x * cos_angle - P4.y * sin_angle + position.x), 
+			(P4.x * sin_angle + P4.y * cos_angle + position.y), 0);		
+		//P1 = new Vector3((P1.x * cos_angle - P1.y * sin_angle + position.x)*final_ratios[stringPlace], 
+		//		(P1.x * sin_angle + P1.y * cos_angle + position.y)*final_ratios[stringPlace], 0);
+		//P2 = new Vector3((P2.x * cos_angle - P2.y * sin_angle + position.x)*final_ratios[stringPlace], 
+	//		(P2.x * sin_angle + P2.y * cos_angle + position.y)*final_ratios[stringPlace], 0);
+	//	P3 = new Vector3((P3.x * cos_angle - P3.y * sin_angle + position.x)*final_ratios[stringPlace], 
+	//		(P3.x * sin_angle + P3.y * cos_angle + position.y)*final_ratios[stringPlace], 0);
+	//	P4 = new Vector3((P4.x * cos_angle - P4.y * sin_angle + position.x)*final_ratios[stringPlace], 
+	//		(P4.x * sin_angle + P4.y * cos_angle + position.y)*final_ratios[stringPlace], 0);
 		//add vertices to mesh
 		mesh_points.Add(P1);
 		mesh_points.Add(P2);
@@ -349,18 +368,16 @@ public class LSystemController : MonoBehaviour {
 		mesh_normals.Add(new Vector3(0,0,-1));
 
 		//add colors
-		//mesh_color.Add(new Color(colours[variable].r,colours[variable].g,colours[variable].b,1));
-		//mesh_color.Add(new Color(colours[variable].r,colours[variable].g,colours[variable].b,1));
-		//mesh_color.Add(new Color(colours[variable].r,colours[variable].g,colours[variable].b,1));
-		//mesh_color.Add(new Color(colours[variable].r,colours[variable].g,colours[variable].b,1));
-
-		mesh_color.Add(new Color(0,0,0,1));
-		mesh_color.Add(new Color(0,0,0,1));
-		mesh_color.Add(new Color(0,0,0,1));
-		mesh_color.Add(new Color(0,0,0,1));
+		mesh_color.Add(new Color(colours[variable].r,colours[variable].g,colours[variable].b,1));
+		mesh_color.Add(new Color(colours[variable].r,colours[variable].g,colours[variable].b,1));
+		mesh_color.Add(new Color(colours[variable].r,colours[variable].g,colours[variable].b,1));
+		mesh_color.Add(new Color(colours[variable].r,colours[variable].g,colours[variable].b,1));
 		}
 
+
+	//
 	// gui helper functions
+	//
 
 	public void MakeString(){
 		LSystemGo ();
@@ -371,10 +388,6 @@ public class LSystemController : MonoBehaviour {
 		BuildTree (final);
 	}
 
-	public void OnRelationStringChanged(){
-		rules_out[dropdown_rules_in.value] = inputfield_rules_out.text;
-	}
-
 	public void OnRelationChanged(){
 		inputfield_rules_out.text = rules_out[dropdown_rules_in.value];
 	}
@@ -383,26 +396,44 @@ public class LSystemController : MonoBehaviour {
 		inputfield_symbol_angle.text = angle[dropdown_symbols_in.value].ToString();
 	}
 
-	public void OnAngleChanged(){
-		angle[dropdown_symbols_in.value] = float.Parse(inputfield_symbol_angle.text);
+	public void OnVariableChanged(){
+		inputfield_variables_width.text = width[dropdown_variables_in.value].ToString();
+		inputfield_variables_length.text = length[dropdown_variables_in.value].ToString();
 	}
 
-	public void OnVariableChanged(){
-		inputfield_variables_width.text = width[dropdown_symbols_in.value].ToString();
-		inputfield_variables_length.text = length[dropdown_symbols_in.value].ToString();
+	public void OnRelationStringChanged(){
+		rules_out[dropdown_rules_in.value] = inputfield_rules_out.text;
+	}
+
+	//
+	public void OnAngleChanged(){
+		float temp = 0;
+		bool isSucessful = float.TryParse(inputfield_symbol_angle.text, out temp);
+		if (isSucessful) {
+			angle[dropdown_symbols_in.value] = temp;
+		}
 	}
 
 	public void OnWidthChanged(){
-		width[dropdown_variables_in.value] = float.Parse(inputfield_variables_width.text);
+		float temp = 0;
+		bool isSucessful = float.TryParse(inputfield_variables_width.text, out temp);
+
+		if (isSucessful) {
+			width[dropdown_variables_in.value] = temp;
+		}
 	}
 
 	public void OnLenthChanged(){
-		length[dropdown_variables_in.value] = float.Parse(inputfield_variables_length.text);
+		float temp = 0;
+		bool isSucessful = float.TryParse(inputfield_variables_length.text, out temp);
+
+		if (isSucessful) {
+			length[dropdown_variables_in.value] = temp;
+		}
 	}
 		
 	public void OnRedChanged(float c) {
 		colours [dropdown_variables_in.value].r = c;
-
 	}
 
 	public void OnBlueChanged(float c) {

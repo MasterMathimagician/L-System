@@ -1,0 +1,35 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual Studio 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Corals", "Assembly-CSharp-firstpass.csproj", "{F8398BAC-6543-D288-248B-5E5B1F82F48F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Corals", "Assembly-CSharp.csproj", "{1D4D7A1C-E2FC-C814-8667-0769FC1EDCD8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Corals", "Assembly-CSharp-Editor-firstpass.csproj", "{6AB8CEE1-F263-D528-DBEC-CA0CB3FA10FA}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F8398BAC-6543-D288-248B-5E5B1F82F48F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F8398BAC-6543-D288-248B-5E5B1F82F48F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F8398BAC-6543-D288-248B-5E5B1F82F48F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F8398BAC-6543-D288-248B-5E5B1F82F48F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1D4D7A1C-E2FC-C814-8667-0769FC1EDCD8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1D4D7A1C-E2FC-C814-8667-0769FC1EDCD8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1D4D7A1C-E2FC-C814-8667-0769FC1EDCD8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1D4D7A1C-E2FC-C814-8667-0769FC1EDCD8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6AB8CEE1-F263-D528-DBEC-CA0CB3FA10FA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6AB8CEE1-F263-D528-DBEC-CA0CB3FA10FA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6AB8CEE1-F263-D528-DBEC-CA0CB3FA10FA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6AB8CEE1-F263-D528-DBEC-CA0CB3FA10FA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(MonoDevelopProperties) = preSolution
+		StartupItem = Assembly-CSharp.csproj
+	EndGlobalSection
+EndGlobal
